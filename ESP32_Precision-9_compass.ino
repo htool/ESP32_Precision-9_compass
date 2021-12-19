@@ -447,7 +447,6 @@ void setup()
       Serial.println("MPU9250 needs calibration.");
       // ----- Level surface message
       Serial.println("Place the compass on a level surface");
-      Serial.println("");
       delay(1000);
       calibrateMPU9250(gyroBias, accelBias); // Calibrate gyro and accelerometers, load biases in bias registers
       if (saveMPU9250Calibration()) {
@@ -596,6 +595,7 @@ void setup()
   AY.setWeight(0.3);
   AG.setWeight(0.3);
 
+  Serial.println("Press 'o' to enable serial output.");
   t_next = 0;
 }
 
@@ -608,7 +608,7 @@ void loop()
   calc_quaternion();                           // This must be done each time through the loop
   calc_pitchRollYaw();
 
-  if (t_next + 500 <= millis())                  // Set timer for 50ms
+  if (t_next + 50 <= millis())                  // Set timer for 50ms
   {
     t_next = millis();                        
     calc_heading();
@@ -1872,12 +1872,11 @@ void calc_heading () {
   */
 
   heading = yaw;
+  heading = heading + heading_offset_deg;
   if (heading < 0) heading += 360.0;                        // Yaw goes negative between 180 amd 360 degrees
-  // if (True_North == true) heading += Declination;        // Calculate True North
-  if (heading < 0) heading += 360.0;                        // Allow for under|overflow
   if (heading >= 360) heading -= 360.0;
   if (send_heading_true) {
-    heading_true = heading + heading_variation + heading_offset_deg;
+    heading_true = heading + heading_variation;
     if (heading_true < 0) heading_true += 360.0;                        // Allow for under|overflow
     if (heading_true >= 360) heading_true -= 360.0;
   }
